@@ -14,17 +14,52 @@ styles.theremin = {
   display: 'inline-block'
 }
 
-class App extends React.Component {
+
+class Tone extends React.Component {
+
   componentDidMount() {
     this.oscillator = createOscillator()
+    this.doImperativeWork()
   }
 
-  play = () => {
-    this.oscillator.play()
+  componentDidUpdate() {
+    this.doImperativeWork()
   }
 
-  stop = () => {
-    this.oscillator.stop()
+  doImperativeWork () {
+    const { isPlaying, pitch, volume } = this.state
+
+    if (isPlaying) {
+      this.oscillator.play()
+    } else {
+      this.oscillator.stop()
+    }
+
+    this.oscillator.setPitchBend(pitch)
+    this.oscillator.setVolume(volume)
+  }
+
+  render () {
+    return null
+  }
+}
+
+
+class App extends React.Component {
+
+  state = {
+    pitch: 0,
+    volume: 0,
+    isPlaying: false
+  };
+
+
+  play () {
+    this.setState({ isPlaying: true })
+  }
+
+  stop () {
+    this.setState({ isPlaying: false })
   }
 
   changeTone = (event) => {
@@ -33,8 +68,7 @@ class App extends React.Component {
     const pitch = (clientX - left) / (right - left)
     const volume = 1 - (clientY - top) / (bottom - top)
 
-    this.oscillator.setPitchBend(pitch)
-    this.oscillator.setVolume(volume)
+    this.setState({ pitch, volume })
   }
 
   render() {
@@ -47,6 +81,7 @@ class App extends React.Component {
           onMouseLeave={this.stop}
           onMouseMove={this.changeTone}
         />
+      <Tone  {...this.state} />
       </div>
     )
   }
