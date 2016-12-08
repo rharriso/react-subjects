@@ -60,11 +60,11 @@ class RainbowList extends React.Component {
     }
 
     return (
-      <div style={{ height: '100%', overflowY: 'scroll', paddingTop: firstItemDisp*rowHeight }}
+      <div style={{ height: '100%', overflowY: 'scroll'}}
         ref={(scrollArea)=> { this.scrollArea = scrollArea }}
         onScroll={this.onScroll.bind(this)}>
 
-        <ol style={{ height: totalHeight }}>
+        <ol style={{ height: totalHeight, paddingTop: firstItemDisp*rowHeight, boxSizing: 'border-box'  }}>
           {items}
         </ol>
       </div>
@@ -74,7 +74,7 @@ class RainbowList extends React.Component {
 
 render(
   <RainbowList
-    numRows={500}
+    numRows={500000}
     rowHeight={RainbowListDelegate.rowHeight}
     renderRowAtIndex={RainbowListDelegate.renderRowAtIndex}
   />,
