@@ -29,7 +29,7 @@
 // - Arrow right, arrow down should select the next option
 // - Arrow left, arrow up should select the previous option
 ////////////////////////////////////////////////////////////////////////////////
-import React, { PropTypes } from 'react'
+import React, {PropTypes} from 'react'
 import ReactDOM from 'react-dom'
 
 class RadioGroup extends React.Component {
@@ -37,20 +37,44 @@ class RadioGroup extends React.Component {
     defaultValue: PropTypes.string
   }
 
+  state = {
+    currentValue: this.props.defaultValue
+  };
+
+  componentDidUpdate () {
+    this.onChange(this.state.currentValue)
+  }
+
   render() {
-    return <div>{this.props.children}</div>
+    const children = React.Children.map(this.props.children, (child) => {
+      if (child.type === RadioOption) {
+        const newChild = React.cloneElement(child, {
+          onClick: () => {
+            this.setState({ currentValue: child.props.value })
+          },
+          isSelected: child.props.value === this.state.currentValue
+        })
+
+        return newChild
+      }
+
+      return child
+    })
+
+    return <div>{children}</div>
   }
 }
 
 class RadioOption extends React.Component {
   static propTypes = {
-    value: PropTypes.string
+    value: PropTypes.string,
+    isSelected: PropTypes.bool.isRequired
   }
 
   render() {
     return (
-      <div>
-        <RadioIcon isSelected={false}/> {this.props.children}
+      <div onClick={this.props.onClick}>
+        <RadioIcon onClick={this.props.onClick} isSelected={this.props.isSelected}/> {this.props.children}
       </div>
     )
   }
@@ -63,7 +87,7 @@ class RadioIcon extends React.Component {
 
   render() {
     return (
-      <div
+      <div onClick={this.props.onClick}
         style={{
           borderColor: '#ccc',
           borderSize: '3px',
@@ -80,12 +104,22 @@ class RadioIcon extends React.Component {
 }
 
 class App extends React.Component {
+
+  defaultValue = 'fm'
+
+  state = {
+    radioValue: this.defaultValue
+  }
+
   render() {
     return (
       <div>
         <h1>♬ It's about time that we all turned off the radio ♫</h1>
+        <h2>`Current state ${this.state.radioValue}`</h2>
 
-        <RadioGroup defaultValue="fm">
+        <RadioGroup defaultValue={this.state.radioValue} onChange={
+            (radioValue) => { this.setState(radioValue) }
+        }>
           <RadioOption value="am">AM</RadioOption>
           <RadioOption value="fm">FM</RadioOption>
           <RadioOption value="tape">Tape</RadioOption>
