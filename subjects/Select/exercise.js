@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react'
 import { render } from 'react-dom'
 import './styles.css'
 
-const { func, any } = PropTypes
+const { func, any, bool } = PropTypes
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -17,12 +17,47 @@ class Select extends React.Component {
     defaultValue: any
   }
 
+  state = {
+    isOpen: false,
+    value: this.props.value || this.props.defaultValue
+  }
+
+  componentDidUpdate (nextProps) {
+    if (nextProps.value && nextProps.value !== this.props.value) {
+      this.setState({ value: this.props.value });
+    }
+  }
+
   render() {
+    let label = '';
+
+    const children = React.Children.map(this.props.children, (child) => {
+      if (child.type === Option) {
+        if(this.state.value === child.props.value) {
+          label = child.props.children;
+        }
+
+        return React.cloneElement(child, {
+          onClick: () => {
+            if(this.props.value) {
+              this.props.onChange && this.props.onChange(child.props.value)
+            } else {
+              this.setState({
+                value: child.props.value
+              })
+            }
+          }
+        });
+      }
+
+      return child
+    });
+
     return (
-      <div className="select">
-        <div className="label">label <span className="arrow">▾</span></div>
+      <div className="select" onClick={() => { this.setState({isOpen: !this.state.isOpen}) }}>
+        <div className="label">{label}<span className="arrow">▾</span></div>
         <div className="options">
-          {this.props.children}
+          {this.state.isOpen && children}
         </div>
       </div>
     )
@@ -33,7 +68,7 @@ class Select extends React.Component {
 class Option extends React.Component {
   render() {
     return (
-      <div className="option">{this.props.children}</div>
+      <div onClick={this.props.onClick} className="option">{this.props.children}</div>
     )
   }
 }
@@ -44,7 +79,7 @@ class App extends React.Component {
   }
 
   setToMintChutney() {
-   this.setState({selectValue: 'mint-chutney'})
+    this.setState({selectValue: 'mint-chutney'})
   }
 
   render() {
@@ -55,7 +90,7 @@ class App extends React.Component {
 
         <h2>Controlled</h2>
         <p>
-          <button onClick={this.setToMintChutney}>Set to Mint Chutney</button>
+          <button onClick={this.setToMintChutney.bind(this)}>Set to Mint Chutney</button>
         </p>
 
         <Select
