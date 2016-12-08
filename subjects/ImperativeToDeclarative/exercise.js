@@ -16,8 +16,7 @@ class Modal extends React.Component {
   }
 
   componentDidMount () {
-    const modalEl = $(findDOMNode(this.refs.modal));
-    this.modal = modalEl.modal.bind(modalEl);
+    this.modal = this.modalEl.modal.bind(this.modalEl)
     this.doImperativeWork()
   }
 
@@ -35,7 +34,7 @@ class Modal extends React.Component {
 
   render() {
     return (
-      <div ref="modal" className="modal fade">
+      <div ref={(modalEl) => { this.modalEl = $(modalEl) }} className="modal fade">
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
