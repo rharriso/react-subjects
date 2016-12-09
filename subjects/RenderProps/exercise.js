@@ -22,7 +22,13 @@ import ReactDOM from 'react-dom'
 import LoadingDots from './utils/LoadingDots'
 import getAddressFromCoords from './utils/getAddressFromCoords'
 
-class App extends React.Component {
+
+class Geolocation extends React.Component {
+
+  static propTypes = {
+    children: PropTypes.func
+  }
+
   state = {
     coords: {
       latitude: null,
@@ -51,20 +57,57 @@ class App extends React.Component {
     navigator.geolocation.clearWatch(this.geoId)
   }
 
+
+  render () {
+    return this.props.children(this.state)
+  }
+}
+
+
+class GeoAddress extends React.Component {
+  state = {};
+
+  componentDidMount() {
+    const {latitude, longitude} = this.props.coords
+    getAddressFromCoords(latitude, longitude).then((address) => {
+      this.setState({address});
+    });
+  }
+
+  render () {
+    return this.props.children(this.state.address)
+  }
+}
+
+
+class App extends React.Component {
+
   render() {
     return (
       <div>
         <h1>Geolocation</h1>
-        {this.state.error ? (
-          <div>Error: {this.state.error.message}</div>
-        ) : (
-          <dl>
-            <dt>Latitude</dt>
-            <dd>{this.state.coords.latitude || <LoadingDots/>}</dd>
-            <dt>Longitude</dt>
-            <dd>{this.state.coords.longitude || <LoadingDots/>}</dd>
-          </dl>
-        )}
+          <Geolocation>
+            {({ coords, error }) => (
+              error ? (
+                <div>Error: {error.message}</div>
+              ) : (
+                <dl>
+                  <dt>Latitude</dt>
+                  <dd>{coords.latitude || <LoadingDots/>}</dd>
+                  <dt>Longitude</dt>
+                  <dd>{coords.longitude || <LoadingDots/>}</dd>
+                  {coords.latitude &&
+                    <GeoAddress coords={coords}>
+                      {(address) => (
+                        <dd>{address || <LoadingDots/>}</dd>
+                      )}
+                    </GeoAddress>
+                  }
+                </dl>
+              )
+            )}
+          </Geolocation>
+
       </div>
     )
   }
