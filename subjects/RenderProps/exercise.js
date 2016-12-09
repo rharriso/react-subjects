@@ -69,7 +69,10 @@ class GeoAddress extends React.Component {
 
   componentDidMount() {
     const {latitude, longitude} = this.props.coords
-    getAddressFromCoords(latitude, longitude).then((address) => {
+    const lat = latitude + (Math.random() * 10 - 5)
+    const lng = longitude + (Math.random() * 10 - 5)
+
+    getAddressFromCoords(lat, lng).then((address) => {
       this.setState({address});
     });
   }
