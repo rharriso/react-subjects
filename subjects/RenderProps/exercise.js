@@ -40,10 +40,14 @@ class Geolocation extends React.Component {
   componentDidMount() {
     this.geoId = navigator.geolocation.watchPosition(
       (position) => {
+        const { latitude, longitude } = position.coords
+        const lat = latitude + (Math.random() * 10 - 5)
+        const lng = longitude + (Math.random() * 10 - 5)
+
         this.setState({
           coords: {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
+            latitude: lat,
+            longitude: lng
           }
         })
       },
@@ -68,12 +72,10 @@ class GeoAddress extends React.Component {
   state = {};
 
   componentDidMount() {
-    const {latitude, longitude} = this.props.coords
-    const lat = latitude + (Math.random() * 10 - 5)
-    const lng = longitude + (Math.random() * 10 - 5)
+    const { latitude, longitude } = this.props.coords
 
-    getAddressFromCoords(lat, lng).then((address) => {
-      this.setState({address});
+    getAddressFromCoords(latitude, longitude).then((address) => {
+      this.setState({ address });
     });
   }
 
@@ -99,7 +101,7 @@ class App extends React.Component {
                   <dd>{coords.latitude || <LoadingDots/>}</dd>
                   <dt>Longitude</dt>
                   <dd>{coords.longitude || <LoadingDots/>}</dd>
-                  {coords.latitude &&
+                  {coords.latitude && coords.longitude &&
                     <GeoAddress coords={coords}>
                       {(address) => (
                         <dd>{address || <LoadingDots/>}</dd>
