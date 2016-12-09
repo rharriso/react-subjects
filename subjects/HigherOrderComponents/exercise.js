@@ -11,30 +11,15 @@ import ReactDOM from 'react-dom'
 const withMousePosition = (Component) => {
 
   return class MousePosition extends React.Component {
-    state = {
-      mouse: {
-        x: 0,
-        y: 0
-      }
-    }
+    state = {}
 
-    componentDidUnmount () {
-      window.removeEventListener('mousemove')
-    }
-
-    componentDidMount () {
-      window.addEventListener('mousemove', (e)=> {
+    render () {
+      return <Component {...this.state} onMouseMove={(e)=> {
         this.setState({
           mouse: {
             x: e.clientX, y: e.clientY
           }
-        })
-      })
-    }
-
-    render () {
-      console.log(this.state, Component);
-      return <Component {...this.state}/>
+      })}} />
     }
   }
 }
@@ -44,14 +29,14 @@ class App extends React.Component {
     mouse: PropTypes.shape({
       x: PropTypes.number.isRequired,
       y: PropTypes.number.isRequired
-    }).isRequired
+    })
   }
 
   render() {
-    const { mouse } = this.props
+    const { mouse, onMouseMove } = this.props
 
     return (
-      <div style={{ height: '100%' }}>
+      <div onMouseMove={onMouseMove} style={{ height: '100%' }}>
         {mouse ? (
           <h1>The mouse position is ({mouse.x}, {mouse.y})</h1>
         ) : (
